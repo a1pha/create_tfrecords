@@ -148,6 +148,8 @@ def _get_filenames_and_classes(dataset_dir):
   photo_filenames = []
   for directory in directories:
     for filename in os.listdir(directory):
+      if not (filename.endswith(".jpg") or filename.endswith(".JPG") or filename.endswith(".gif") or filename.endswith(".GIF") or filename.endswith(".jpeg") or filename.endswith(".JPEG")):
+        continue
       path = os.path.join(directory, filename)
       photo_filenames.append(path)
 
@@ -192,14 +194,17 @@ def _convert_dataset(split_name, filenames, class_names_to_ids, dataset_dir, tfr
             sys.stdout.flush()
 
             # Read the filename:
-            image_data = tf.gfile.FastGFile(filenames[i], 'r').read()
-            height, width = image_reader.read_image_dims(sess, image_data)
+            image_data = tf.gfile.FastGFile(filenames[i], 'rb').read()
+            try:
+              height, width = image_reader.read_image_dims(sess, image_data)
+            except:
+              continue
 
             class_name = os.path.basename(os.path.dirname(filenames[i]))
             class_id = class_names_to_ids[class_name]
 
             example = image_to_tfexample(
-                image_data, 'jpg', height, width, class_id)
+                image_data, b'jpg', height, width, class_id)
             tfrecord_writer.write(example.SerializeToString())
 
   sys.stdout.write('\n')

@@ -35,12 +35,14 @@ def main():
 
     #If the TFRecord files already exist in the directory, then exit without creating the files again
     if _dataset_exists(dataset_dir = FLAGS.dataset_dir, _NUM_SHARDS = FLAGS.num_shards, output_filename = FLAGS.tfrecord_filename):
-        print 'Dataset files already exist. Exiting without re-creating them.'
+        print('Dataset files already exist. Exiting without re-creating them.')
         return None
     #==============================================================END OF CHECKS===================================================================
 
     #Get a list of photo_filenames like ['123.jpg', '456.jpg'...] and a list of sorted class names from parsing the subdirectories.
     photo_filenames, class_names = _get_filenames_and_classes(FLAGS.dataset_dir)
+    photo_filenames = list(filter(lambda k: '.DS_Store' not in k, photo_filenames))
+
 
     #Refer each of the class name to a specific integer number for predictions later
     class_names_to_ids = dict(zip(class_names, range(len(class_names))))
@@ -64,7 +66,7 @@ def main():
     labels_to_class_names = dict(zip(range(len(class_names)), class_names))
     write_label_file(labels_to_class_names, FLAGS.dataset_dir)
 
-    print '\nFinished converting the %s dataset!' % (FLAGS.tfrecord_filename)
+    print('\nFinished converting the %s dataset!' % (FLAGS.tfrecord_filename))
 
 if __name__ == "__main__":
     main()
